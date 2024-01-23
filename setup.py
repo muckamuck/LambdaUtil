@@ -1,11 +1,11 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 import os
 
 
 setup(
     name='LambdaUtil',
     version='0.0.1',
-    packages=['lambdautil'],
+    packages=find_packages(),
     description='Python Lambda Utility',
     author='Duke P. Takle',
     author_email='duke.takle@gmail.com',
