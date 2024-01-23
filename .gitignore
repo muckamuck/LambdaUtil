@@ -1,0 +1,13 @@
+tmp/
+*.egg-info/
+__pycache__/
+dist/
+build/
+*.pyc
+*.zip
+*.tar
+*.tgz
+*.log
+x
+xx
+xxx
