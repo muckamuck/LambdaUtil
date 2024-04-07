@@ -11,7 +11,6 @@ from lambdautil.parts.simple import main_code as simple_main_code
 from lambdautil.parts.simple import requirements_txt as simple_requirements_txt
 from lambdautil.parts.service import main_code as service_main_code
 from lambdautil.parts.service import requirements_txt as service_requirements_txt
-from lambdautil.cfg import LAMBDAUTIL_TMP
 from lambdautil.cfg import LAMBDAUTIL_BUCKET
 from lambdautil.cfg import LAMBDAUTIL_ROLE
 
