@@ -209,6 +209,14 @@ class LambdaDeployer:
             subnets = self.config.get('network', {}).get('subnets')
             security_group = self.config.get('network', {}).get('security_group')
 
+            whitelist = self.config.get('network', {}).get('whitelist')
+            if whitelist:
+                self.whitelist = whitelist.split(',')
+                logger.info('adding CIDR whitelist to deployment')
+            else:
+                self.whitelist = None
+                logger.debug('not adding CIDR whitelist to deployment')
+
             if subnets is None and security_group is None:
                 return True
             elif None in [subnets, security_group]:
