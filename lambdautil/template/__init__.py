@@ -127,6 +127,29 @@ trusted_service = {
 }  # wrk['Properties']['Principal']
 
 '''
+aws:SourceIp is a list of CIDR blocks to let in. Sibling of
+Properties.Body in the_api
+'''
+white_list = {
+    "Policy": {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "execute-api:Invoke",
+                "Resource": "arn:aws:execute-api:*:*:*",
+                "Condition": {
+                    "IpAddress": {
+                        "aws:SourceIp": []
+                    }
+                }
+            }
+        ]
+    }
+}
+
+'''
 Path: Properties|Body|info|title - value: xxx-title
 Path: Properties|Body|basePath - value: xxx-base-path
 Path: Properties|Body|paths|/|x-amazon-apigateway-any-method|x-amazon-apigateway-integration|uri - value: xxx-uri0
