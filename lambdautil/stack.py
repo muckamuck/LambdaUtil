@@ -28,6 +28,12 @@ complete_states = [
     'UPDATE_ROLLBACK_COMPLETE'
 ]
 
+successful_states = [
+    'CREATE_COMPLETE',
+    'UPDATE_COMPLETE',
+    'DELETE_COMPLETE'
+]
+
 try:
     POLL_INTERVAL = int(os.environ.get('CSU_POLL_INTERVAL', 30))
 except:
@@ -139,7 +145,7 @@ class StackUtility:
                 current_status = stack['StackStatus']
                 logger.info(f'current status of {stack_name}: {current_status}')
                 if current_status.endswith('COMPLETE') or current_status.endswith('FAILED'):
-                    if current_status in complete_states:
+                    if current_status in successful_states:
                         return True
                     else:
                         return False
