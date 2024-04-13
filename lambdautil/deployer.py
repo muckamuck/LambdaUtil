@@ -21,6 +21,7 @@ from lambdautil.template import trusted_service
 from lambdautil.template import the_api
 from lambdautil.template import the_deployment
 from lambdautil.template import the_outputs
+from lambdautil.template import white_list
 
 from lambdautil.stack import StackUtility 
 
@@ -211,7 +212,7 @@ class LambdaDeployer:
 
             whitelist = self.config.get('network', {}).get('whitelist')
             if whitelist:
-                self.whitelist = whitelist.split(',')
+                self.whitelist = [wrk.strip() for wrk in whitelist.split(',')]
                 logger.info('adding CIDR whitelist to deployment')
             else:
                 self.whitelist = None
@@ -311,6 +312,11 @@ class LambdaDeployer:
                 deployment_part = copy.deepcopy(the_deployment)
                 deployment_part['Properties']['Description'] = self.stage
                 deployment_part['Properties']['StageName'] = self.stage
+
+                if self.whitelist:
+                    whitelist_part = copy.deepcopy(white_list)
+                    whitelist_part['Policy']['Statement'][0]['Condition']['IpAddress']['aws:SourceIp'] = self.whitelist
+                    api_part['Properties']['Policy'] = whitelist_part['Policy']
 
                 self.template['Resources']['theAPI'] = api_part
                 self.template['Resources']['theDeployment'] = deployment_part
