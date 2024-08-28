@@ -32,6 +32,7 @@ TOOL_FILE = '.lambdautil'
 IGNORED_STUFF = ('config', '.git', 'requirements.txt', TOOL_FILE)
 TMP_DIR = os.environ.get('LAMBDAUTIL_TMP', '/tmp')
 IMPORT_HEADER = '[import:'
+SSM_HEADER = '[ssm:'
 
 class LambdaDeployer:
     def __init__(self, parameters):
@@ -39,6 +40,7 @@ class LambdaDeployer:
         arn:aws:apigateway:{self.region}:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:{self.account}:function:baz-svc-dev/invocations
         '''
         try:
+            self.ssm_client = None
             self.verbose = parameters.get('verbose', False)
             if self.verbose:
                 logger.setLevel(logging.DEBUG)
@@ -328,7 +330,12 @@ class LambdaDeployer:
                 self.template['Resources']['LambdaFunction']['Properties']['VpcConfig']['SubnetIds'] = self.subnets
 
             for k in self.config.get('parameters', {}).keys():
-                v = self.config.get('parameters', {})[k]
+                wrk = self.config.get('parameters', {})[k]
+                if wrk.startswith(SSM_HEADER):
+                    v = self._read_ssm_thing(wrk)
+                else:
+                    v = wrk
+
                 self.template['Resources']['LambdaFunction']['Properties']['Environment']['Variables'][k] = v
 
             self.name = f"{self.config['config']['name']}-{self.config['config']['stage']}"
@@ -479,6 +486,19 @@ class LambdaDeployer:
             logger.warning(f'problem adding schedule: [{wtf}]')
 
         return False
+
+    def _read_ssm_thing(self, complete_value):
+        try:
+            if self.ssm_client is None:
+                self.ssm_client = boto3.client('ssm')
+
+            ssm_key = complete_value.replace('[', '').replace(']', '').replace('ssm:', '').replace(' ', '')
+            response = self.ssm_client.get_parameter(Name=ssm_key, WithDecryption=True)
+            return response.get('Parameter', {}).get('Value', None)
+        except Exception as wtf:
+            logger.warning(f'problem adding schedule: [{wtf}]')
+
+        return None
 
     def _upsert_function(self):
         try:
