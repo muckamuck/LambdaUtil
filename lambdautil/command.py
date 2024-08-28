@@ -1,6 +1,7 @@
 '''
 The command line interface to Lambda Utility
 '''
+# pylint: disable=line-too-long
 import sys
 import json
 import logging
@@ -31,7 +32,9 @@ lambdatool deploy. The lambda has been started in main.py.
 @click.group()
 @click.version_option(version='0.1.0')
 def cli():
-    pass
+    '''
+    The command line interface to Lambda Utility
+    '''
 
 
 @cli.command()
@@ -65,6 +68,9 @@ def new(**kwargs):
 @click.option('-v', '--verbose', help='turn the logging knob to \'leven', is_flag=True)
 @click.option('-e', '--environment', help='key/value pair for function env variable', multiple=True)
 def deploy(**kwargs):
+    '''
+    Deploy a Lambda function
+    '''
     if kwargs.get('verbose'):
         logger.setLevel(logging.DEBUG)
 
@@ -74,9 +80,3 @@ def deploy(**kwargs):
         sys.exit(0)
     else:
         sys.exit(1)
-
-
-@cli.command()
-@click.option('-s', '--stuff', multiple=True)
-def extra(**kwargs):
-    logger.info('kwargs: %s', json.dumps(kwargs, indent=2))
