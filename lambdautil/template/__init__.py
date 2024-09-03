@@ -160,6 +160,11 @@ the_api = {
     "DependsOn": "LambdaFunction",
     "Properties": {
         "Description": "LambdaUtil created this AWS ApiGateway RestApi thing",
+        "EndpointConfiguration": {
+            "Types": [
+                "EDGE"
+            ]
+        },
         "Body": {
             "swagger": "2.0",
             "info": {

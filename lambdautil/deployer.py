@@ -34,6 +34,12 @@ TMP_DIR = os.environ.get('LAMBDAUTIL_TMP', '/tmp')
 IMPORT_HEADER = '[import:'
 SSM_HEADER = '[ssm:'
 
+VALID_ENDPOINT_CONFIG = [
+    'REGIONAL',
+    'EDGE',
+    'PRIVATE'
+]
+
 class LambdaDeployer:
     def __init__(self, parameters):
         '''
@@ -98,6 +104,16 @@ class LambdaDeployer:
                 self.is_service = self.config['config']['apig'].lower() == 'true'
             except Exception:
                 self.is_service = False
+
+            if self.is_service:
+                self.endpoint_config = self.config.get('network', {}).get('endpoint_config', 'EDGE').upper()
+
+                if self.endpoint_config not in VALID_ENDPOINT_CONFIG:
+                    logger.error(f'Network endpoint_config must be one of {VALID_ENDPOINT_CONFIG}')
+                    sys.exit(1)
+                else:
+                    logger.info(f'Network endpoint_config is {self.endpoint_config}')
+
         except Exception as wtf:
             logger.error(wtf, exc_info=self.verbose)
             logger.error(f'deployer initialization failed with: {wtf}')
@@ -306,6 +322,7 @@ class LambdaDeployer:
 
             if self.is_service:
                 api_part = copy.deepcopy(the_api)
+                api_part['Properties']['EndpointConfiguration']['Types'][0] = self.endpoint_config
                 api_part['Properties']['Body']['info']['title'] = self.name
                 api_part['Properties']['Body']['basePath'] = f'/{self.stage}'
                 api_part['Properties']['Body']['paths']['/']['x-amazon-apigateway-any-method']['x-amazon-apigateway-integration']['uri'] = self.uri
