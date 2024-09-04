@@ -1,7 +1,7 @@
 from datetime import datetime
 
 __title__ = 'lambdatool'
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 __author__ = 'Duke P. Takle'
 __author_email__ = 'duke.takle@gmail.com'
 __license__ = '''MIT License

@@ -84,7 +84,7 @@ class LambdaCreator:
 
             with open(f'{self.directory}/.lambdautil', 'w') as f:
                 msg = {
-                    'tool-version': '0.2.0',
+                    'tool-version': '0.2.1',
                     'init-time': int(time.time())
                 }
                 f.write(json.dumps(msg, indent=2))
@@ -146,7 +146,7 @@ class LambdaCreator:
                 f.write('; subnets =        ; TODO: ask for subnets\n\n')
 
                 f.write('[tags]\n')
-                f.write(f'tool = LambdaUtil 0.2.0\n\n')
+                f.write(f'tool = LambdaUtil 0.2.1\n\n')
 
                 f.write('[parameters]\n')
                 f.write('ANSWER = 42')
