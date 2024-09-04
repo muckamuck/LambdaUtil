@@ -402,7 +402,7 @@ class LambdaDeployer:
 
             wrk = {
                 'ParameterKey': 'runTime',
-                'ParameterValue': 'python3.11'
+                'ParameterValue': 'python3.10'
             }
             stack_parameters.append(wrk)
 
