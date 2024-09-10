@@ -47,6 +47,7 @@ class LambdaCreator:
         self.service = parameters.get('service')
         self.profile = parameters.get('profile')
         self.region = parameters.get('region')
+        self.image_packaging = parameters.get('image')
 
         if None in [self.name]:
             self.valid = False
@@ -55,12 +56,12 @@ class LambdaCreator:
         else:
             self.valid = True
             logger.debug(f'LambdaCreator valid={self.valid}')
-        
+
     def create(self):
         if not self.valid:
             logger.error('LambdaCreator is not valid, bye')
             sys.exit(1)
-       
+
         try:
             os.makedirs(f'{self.directory}/config', exist_ok=False)
             logger.info('LambdaCreator successfully created project directory')
@@ -127,9 +128,22 @@ class LambdaCreator:
             if len(bucket_name) == 0:
                 bucket_name = ' ; TODO: ADD_YOUR_ARTIFACT_BUCKET'
             else:
-                logger.debug(f'using {bucket_name} as the the artifacts bucket for deployment')
+                logger.info(f'using {bucket_name} as the artifacts bucket for deployment')
 
             print('\n')
+
+            if self.image_packaging:
+                bucket_name = None
+                image_uri = input("Enter the image URI (smash enter to skip): ").strip()
+
+                if len(image_uri) == 0:
+                    image_uri = 'INSERT_IMAGE_URI_HERE'
+                else:
+                    logger.info(f'using {image_uri} as the image')
+
+                print('\n')
+            else:
+                image_uri = None
 
             with open(f'{self.directory}/config/{DEFAULT_STAGE}.ini', 'w') as f:
                 f.write('[config]\n')
@@ -139,6 +153,10 @@ class LambdaCreator:
                 f.write(f'timeout = {DEFAULT_TIMEOUT}\n')
                 f.write(f'memory = {DEFAULT_MEMORY}\n')
                 f.write(f'bucket = {bucket_name}\n')
+
+                if self.image_packaging:
+                    f.write(f'image_uri = {image_uri}\n')
+
                 f.write(f'role = {role_arn}\n\n')
 
                 f.write('[network]\n')

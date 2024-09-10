@@ -42,6 +42,7 @@ def cli():
 @click.option('-d', '--directory', help='target directory for new Lambda, defaults to current directory')
 @click.option('-s', '--service', help='create a flask like micro-service', is_flag=True)
 @click.option('-v', '--verbose', help='turn the logging knob to \'leven', is_flag=True)
+@click.option('-i', '--image', help='the new lambda will be packaged in a Docker image', is_flag=True)
 def new(**kwargs):
     '''
     Make a new lambda skeleton

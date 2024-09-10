@@ -11,6 +11,20 @@ LambdaTool deployer expects this to be called \'lambda_handler\'
 lambda_handler = FlaskLambda(__name__)
 
 
+def create_json_dump(o):
+    \'\'\'
+    Another helper function for JSON serialization
+    \'\'\'
+    if isinstance(o, datetime.datetime):
+        return o.__str__()
+    elif isinstance(o, datetime.date):
+        return o.__str__()
+    elif isinstance(o, bytes):
+        return o.decode('utf-8')
+
+    return None
+
+
 @lambda_handler.route(\'/\', methods=[\'GET\'])
 def OK():
     \'\'\'
@@ -23,9 +37,9 @@ def OK():
         tuple of (body, status code, content type) that API Gateway understands
     \'\'\'
     return (
-        \'OK\',
+        'OK',
         200,
-        {\'Content-Type\': \'text/plain\'}
+        {'Content-Type': 'text/plain'}
     )
 
 
@@ -43,7 +57,7 @@ def document():
     return (
         slash_html,
         200,
-        {\'Content-Type\': \'text/html\'}
+        {'Content-Type': 'text/html'}
     )
 
 
@@ -65,7 +79,7 @@ def get_answer():
     return (
         msg,
         200,
-        {\'Content-Type\': \'text/plain\'}
+        {'Content-Type': 'text/plain'}
     )
 
 
@@ -82,27 +96,44 @@ def food():
         tuple of (body, status code, content type) that API Gateway understands
     \'\'\'
     data = {
-        \'form\': request.form.copy(),
-        \'args\': request.args.copy(),
-        \'json\': request.json
+        'form': request.form.copy(),
+        'args': request.args.copy(),
+        'json': request.json
     }
     return (
         json.dumps(data, indent=4, sort_keys=True),
         200,
-        {\'Content-Type\': \'application/json\'}
+        {'Content-Type': 'application/json'}
     )
 
+
+@lambda_handler.route('/event', methods=['GET'])
+def event():
+    \'\'\'
+    Return the event as application/json
+
+    Args:
+        None
+
+    Returns:
+        tuple of (body, status code, content type) that API Gateway understands
+    \'\'\'
+    return (
+        json.dumps(lambda_handler.get_event(), default=create_json_dump, indent=2),
+        200,
+        {'Content-Type': 'application/json'}
+    )
 
 slash_html = \'\'\'<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <title>Lambtool Readme</title>
-    <meta http-equiv="refresh" content="0;URL=\'https://github.com/muckamuck/lambda-tool/blob/master/README.md\'" />
+    <meta http-equiv="refresh" content="0;URL='https://github.com/muckamuck/lambda-tool/blob/master/README.md'" />
   </head>
   <body></body>
 </html>
 \'\'\'
 
-if __name__ == \'__main__\':
+if __name__ == '__main__':
     lambda_handler.run(debug=True)
 '''
 
