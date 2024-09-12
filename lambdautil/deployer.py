@@ -9,6 +9,7 @@ import shutil
 import zipfile
 import json
 import copy
+import time
 
 import boto3
 
@@ -22,7 +23,7 @@ from lambdautil.template import the_api
 from lambdautil.template import the_deployment
 from lambdautil.template import the_outputs
 from lambdautil.template import white_list
-
+from lambdautil.utility import date_converter
 from lambdautil.stack import StackUtility 
 
 logger = logging.getLogger(__name__)
@@ -91,6 +92,11 @@ class LambdaDeployer:
                                             'cloudformation',
                                             self.verbose)
 
+            self.lambda_client = get_api_client(self.profile,
+                                                self.region,
+                                                'lambda',
+                                                self.verbose)
+
             self.scheduled = False
             self.package_key = None
             self._read_config_info()
@@ -128,6 +134,23 @@ class LambdaDeployer:
 
         if not self._upsert_function():
             return False
+
+        if self.image_packaging:
+            logger.info(f'updating code from {self.image_uri}')
+            try:
+                response = self.lambda_client.update_function_code(
+                    FunctionName=self.name,
+                    ImageUri=self.image_uri
+                )
+
+                if self.verbose:
+                    logger.info(json.dumps(response, indent=2, default=date_converter))
+
+                response_code = response.get('ResponseMetadata', {}).get('HTTPStatusCode', '-1')
+                logger.info(f'updating code returned response_code={response_code}')
+            except Exception as wtf:
+                logger.error(str(wtf), exc_info=self.verbose)
+                return False
 
         return True
 
@@ -285,10 +308,16 @@ class LambdaDeployer:
     def _read_tags(self):
         try:
             self.tags = []
+
             for k in self.config.get('tags', {}).keys():
                 v = self.config.get('tags', {})[k]
                 wrk = { 'Key': k, 'Value': v }
                 self.tags.append(wrk)
+
+            k = 'FUNCTION_UPSERT_TIME'
+            v = str(int(time.time()))
+            wrk = { 'Key': k, 'Value': v }
+            self.tags.append(wrk)
         except Exception as wtf:
             logger.error(f'reading tags from {self.config_file} failed with: {wtf}')
             return sys.exit(1)
