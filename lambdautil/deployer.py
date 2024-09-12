@@ -119,8 +119,9 @@ class LambdaDeployer:
             logger.error(f'deployer initialization failed with: {wtf}')
 
     def deploy(self):
-        if not self._create_package():
-            return False
+        if not self.image_packaging:
+            if not self._create_package():
+                return False
 
         if not self._create_cloud_formation():
             return False
@@ -203,6 +204,12 @@ class LambdaDeployer:
                     the_stuff[section][option] = config.get(section, option)
 
             self.config = the_stuff
+            self.image_packaging = self.config.get('config').get('image_uri') is not None
+            if self.image_packaging:
+                logger.info('the Lambda function will deployed using the given image')
+                self.image_uri = self.config.get('config').get('image_uri')
+            else:
+                logger.info('the Lambda function will be packaged and deployed from a zip file in AWS S3')
             logger.debug(json.dumps(the_stuff, indent=2))
 
             if not self._verify_config_info():
@@ -320,6 +327,20 @@ class LambdaDeployer:
         try:
             self.template = copy.deepcopy(starter)
 
+            if self.image_packaging:
+                self.template['Parameters']['imageUri'] = { 'Type': 'String' }
+                self.template['Resources']['LambdaFunction']['Properties']['Code']['ImageUri'] = { 'Ref': 'imageUri' }
+                self.template['Resources']['LambdaFunction']['Properties']['PackageType'] = 'Image'
+            else:
+                self.template['Parameters']['handler'] = { 'Type': 'String' }
+                self.template['Parameters']['runTime'] = { 'Type': 'String' }
+                self.template['Parameters']['s3Bucket'] = { 'Type': 'String' }
+                self.template['Parameters']['s3Key'] = { 'Type': 'String' }
+                self.template['Resources']['LambdaFunction']['Properties']['Code']['S3Bucket'] = { 'Ref': 's3Bucket' }
+                self.template['Resources']['LambdaFunction']['Properties']['Code']['S3Key'] = { 'Ref': 's3Key' }
+                self.template['Resources']['LambdaFunction']['Properties']['Handler'] = { 'Ref': 'handler' }
+                self.template['Resources']['LambdaFunction']['Properties']['Runtime'] = { 'Ref': 'runTime' }
+
             if self.is_service:
                 api_part = copy.deepcopy(the_api)
                 api_part['Properties']['EndpointConfiguration']['Types'][0] = self.endpoint_config
@@ -358,17 +379,37 @@ class LambdaDeployer:
             self.name = f"{self.config['config']['name']}-{self.config['config']['stage']}"
             logger.debug(json.dumps(self.template, indent=2))
             stack_parameters = []
-            wrk = {
-                'ParameterKey': 's3Bucket',
-                'ParameterValue': self.config['config']['bucket']
-            }
-            stack_parameters.append(wrk)
 
-            wrk = {
-                'ParameterKey': 's3Key',
-                'ParameterValue': self.package_key
-            }
-            stack_parameters.append(wrk)
+            if self.image_packaging:
+                wrk = {
+                    'ParameterKey': 'imageUri',
+                    'ParameterValue': self.image_uri
+                }
+                stack_parameters.append(wrk)
+            else:
+                wrk = {
+                    'ParameterKey': 'runTime',
+                    'ParameterValue': 'python3.10'
+                }
+                stack_parameters.append(wrk)
+
+                wrk = {
+                    'ParameterKey': 's3Bucket',
+                    'ParameterValue': self.config['config']['bucket']
+                }
+                stack_parameters.append(wrk)
+
+                wrk = {
+                    'ParameterKey': 's3Key',
+                    'ParameterValue': self.package_key
+                }
+                stack_parameters.append(wrk)
+
+                wrk = {
+                    'ParameterKey': 'handler',
+                    'ParameterValue': 'main.lambda_handler'
+                }
+                stack_parameters.append(wrk)
 
             wrk = {
                 'ParameterKey': 'functionName',
@@ -383,12 +424,6 @@ class LambdaDeployer:
             stack_parameters.append(wrk)
 
             wrk = {
-                'ParameterKey': 'handler',
-                'ParameterValue': 'main.lambda_handler'
-            }
-            stack_parameters.append(wrk)
-
-            wrk = {
                 'ParameterKey': 'retentionDays',
                 'ParameterValue': '30'
             }
@@ -397,12 +432,6 @@ class LambdaDeployer:
             wrk = {
                 'ParameterKey': 'memorySize',
                 'ParameterValue': self.config['config']['memory']
-            }
-            stack_parameters.append(wrk)
-
-            wrk = {
-                'ParameterKey': 'runTime',
-                'ParameterValue': 'python3.10'
             }
             stack_parameters.append(wrk)
 

@@ -11,6 +11,7 @@ from lambdautil.parts.simple import main_code as simple_main_code
 from lambdautil.parts.simple import requirements_txt as simple_requirements_txt
 from lambdautil.parts.service import main_code as service_main_code
 from lambdautil.parts.service import requirements_txt as service_requirements_txt
+from lambdautil.parts import docker_file
 from lambdautil.cfg import LAMBDAUTIL_BUCKET
 from lambdautil.cfg import LAMBDAUTIL_ROLE
 
@@ -90,6 +91,10 @@ class LambdaCreator:
                 }
                 f.write(json.dumps(msg, indent=2))
 
+            if self.image_packaging:
+                with open(f'{self.directory}/Dockerfile', 'w') as f:
+                    f.write(docker_file)
+
             logger.info('LambdaCreator successfully created source files.')
 
             if self._create_config():
@@ -120,18 +125,6 @@ class LambdaCreator:
 
             print('\n')
 
-            bucket_name = input("Enter artifact bucket (smash enter to skip): ").strip()
-            if len(bucket_name) == 0 and LAMBDAUTIL_BUCKET is not None:
-                bucket_name = LAMBDAUTIL_BUCKET
-                logger.info(f'using default bucket {LAMBDAUTIL_BUCKET}')
-
-            if len(bucket_name) == 0:
-                bucket_name = ' ; TODO: ADD_YOUR_ARTIFACT_BUCKET'
-            else:
-                logger.info(f'using {bucket_name} as the artifacts bucket for deployment')
-
-            print('\n')
-
             if self.image_packaging:
                 bucket_name = None
                 image_uri = input("Enter the image URI (smash enter to skip): ").strip()
@@ -144,6 +137,15 @@ class LambdaCreator:
                 print('\n')
             else:
                 image_uri = None
+                bucket_name = input("Enter artifact bucket (smash enter to skip): ").strip()
+                if len(bucket_name) == 0 and LAMBDAUTIL_BUCKET is not None:
+                    bucket_name = LAMBDAUTIL_BUCKET
+                    logger.info(f'using default bucket {LAMBDAUTIL_BUCKET}')
+
+                if len(bucket_name) == 0:
+                    bucket_name = ' ; TODO: ADD_YOUR_ARTIFACT_BUCKET'
+                else:
+                    logger.info(f'using {bucket_name} as the artifacts bucket for deployment')
 
             with open(f'{self.directory}/config/{DEFAULT_STAGE}.ini', 'w') as f:
                 f.write('[config]\n')
@@ -152,10 +154,11 @@ class LambdaCreator:
                 f.write(f'apig = {self.service}\n')
                 f.write(f'timeout = {DEFAULT_TIMEOUT}\n')
                 f.write(f'memory = {DEFAULT_MEMORY}\n')
-                f.write(f'bucket = {bucket_name}\n')
 
                 if self.image_packaging:
                     f.write(f'image_uri = {image_uri}\n')
+                else:
+                    f.write(f'bucket = {bucket_name}\n')
 
                 f.write(f'role = {role_arn}\n\n')
 

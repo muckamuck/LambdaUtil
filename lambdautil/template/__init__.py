@@ -6,30 +6,30 @@ starter = {
     'AWSTemplateFormatVersion': '2010-09-09',
     'Description': '42 is the answer',
     'Parameters': {
-        's3Bucket': {
-            'Type': 'String'
-        },
-        's3Key': {
-            'Type': 'String'
-        },
+        # 's3Bucket': {
+        #     'Type': 'String'
+        # },
+        # 's3Key': {
+        #     'Type': 'String'
+        # },
         'functionName': {
             'Type': 'String'
         },
         'logGroupName': {
             'Type': 'String'
         },
-        'handler': {
-            'Type': 'String'
-        },
+        # 'handler': {
+        #     'Type': 'String'
+        # },
         'retentionDays': {
             'Type': 'String'
         },
         'memorySize': {
             'Type': 'String'
         },
-        'runTime': {
-            'Type': 'String'
-        },
+        # 'runTime': {
+        #     'Type': 'String'
+        # },
         'timeOut': {
             'Type': 'String'
         },
@@ -52,31 +52,18 @@ starter = {
         'LambdaFunction': {
             'Type': 'AWS::Lambda::Function',
             'Properties': {
-                'Code': {
-                    'S3Bucket': {
-                        'Ref': 's3Bucket'
-                    },
-                    'S3Key': {
-                        'Ref': 's3Key'
-                    }
-                },
+                'Code': {},
                 'Environment': {
                     'Variables': {}
                 },
                 'FunctionName': {
                     'Ref': 'functionName'
                 },
-                'Handler': {
-                    'Ref': 'handler'
-                },
                 'MemorySize': {
                     'Ref': 'memorySize'
                 },
                 'Role': {
                     'Ref': 'role'
-                },
-                'Runtime': {
-                    'Ref': 'runTime'
                 },
                 'Timeout': {
                     'Ref': 'timeOut'
