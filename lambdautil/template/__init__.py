@@ -6,30 +6,18 @@ starter = {
     'AWSTemplateFormatVersion': '2010-09-09',
     'Description': '42 is the answer',
     'Parameters': {
-        # 's3Bucket': {
-        #     'Type': 'String'
-        # },
-        # 's3Key': {
-        #     'Type': 'String'
-        # },
         'functionName': {
             'Type': 'String'
         },
         'logGroupName': {
             'Type': 'String'
         },
-        # 'handler': {
-        #     'Type': 'String'
-        # },
         'retentionDays': {
             'Type': 'String'
         },
         'memorySize': {
             'Type': 'String'
         },
-        # 'runTime': {
-        #     'Type': 'String'
-        # },
         'timeOut': {
             'Type': 'String'
         },
