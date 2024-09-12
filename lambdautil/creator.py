@@ -133,8 +133,6 @@ class LambdaCreator:
                     image_uri = 'INSERT_IMAGE_URI_HERE'
                 else:
                     logger.info(f'using {image_uri} as the image')
-
-                print('\n')
             else:
                 image_uri = None
                 bucket_name = input("Enter artifact bucket (smash enter to skip): ").strip()
@@ -146,6 +144,8 @@ class LambdaCreator:
                     bucket_name = ' ; TODO: ADD_YOUR_ARTIFACT_BUCKET'
                 else:
                     logger.info(f'using {bucket_name} as the artifacts bucket for deployment')
+
+            print('\n')
 
             with open(f'{self.directory}/config/{DEFAULT_STAGE}.ini', 'w') as f:
                 f.write('[config]\n')
