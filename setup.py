@@ -4,7 +4,7 @@ import os
 
 setup(
     name='LambdaUtil',
-    version='0.2.1',
+    version='0.3.0',
     packages=find_packages(),
     description='Python Lambda Utility',
     author='Duke P. Takle',
