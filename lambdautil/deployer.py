@@ -484,6 +484,8 @@ class LambdaDeployer:
                     logger.error('failed to add schedule rule')
                     sys.exit(1)
 
+            self.trusted_account = self.config['config'].get('trustedAccount', None)
+
             trusted_services = self.config['config'].get('trustedService', None)
             if trusted_services is not None:
                 parts = trusted_services.split(',')
@@ -554,6 +556,10 @@ class LambdaDeployer:
             resource_name = f'Trust{parts[0].capitalize()}Permission'
             wrk = copy.deepcopy(trusted_service)
             wrk['Properties']['Principal'] = service
+
+            if self.trusted_account:
+                wrk['Properties']['SourceAccount'] = self.trusted_account
+
             self.template['Resources'][resource_name] = wrk
 
             return True

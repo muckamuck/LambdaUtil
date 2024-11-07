@@ -99,7 +99,7 @@ trusted_service = {
             "Ref": "trustedService"
         }
     }
-}  # wrk['Properties']['Principal']
+}
 
 '''
 aws:SourceIp is a list of CIDR blocks to let in. Sibling of
