@@ -30,7 +30,7 @@ lambdatool deploy. The lambda has been started in main.py.
 
 
 @click.group()
-@click.version_option(version='0.4.0')
+@click.version_option(version='0.4.1')
 def cli():
     '''
     The command line interface to Lambda Utility
