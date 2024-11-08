@@ -484,14 +484,14 @@ class LambdaDeployer:
                     logger.error('failed to add schedule rule')
                     sys.exit(1)
 
-            self.trusted_account = self.config['config'].get('trustedAccount', None)
+            trusted_account = self.config['config'].get('trustedAccount', None)
 
             trusted_services = self.config['config'].get('trustedService', None)
             if trusted_services is not None:
                 parts = trusted_services.split(',')
                 services = [service.strip() for service in list(set(parts))]
                 for service in services:
-                    if self._trust_service(service):
+                    if self._trust_service(service, trusted_account):
                         logger.info(f'successfully trusted {service=}')
                     else:
                         logger.error(f'failed to trust {service}')
@@ -546,7 +546,7 @@ class LambdaDeployer:
 
         return False
 
-    def _trust_service(self, service):
+    def _trust_service(self, service, trusted_account=None):
         try:
             if self.scheduled and service == 'events.amazonaws.com':
                 logger.warning('events.amazonaws.com already trusted implicitly')
@@ -557,8 +557,8 @@ class LambdaDeployer:
             wrk = copy.deepcopy(trusted_service)
             wrk['Properties']['Principal'] = service
 
-            if self.trusted_account:
-                wrk['Properties']['SourceAccount'] = self.trusted_account
+            if trusted_account:
+                wrk['Properties']['SourceAccount'] = trusted_account
 
             self.template['Resources'][resource_name] = wrk
 
