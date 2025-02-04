@@ -332,7 +332,7 @@ class LambdaDeployer:
 
             rv = os.system(command)
             if rv != 0:
-                logger.error('installing requirements failed {rv=}')
+                logger.error(f'installing requirements failed {rv=}')
                 sys.exit(1)
 
             if not self._copy_stuff():
