@@ -3,8 +3,11 @@ import logging
 import json
 import datetime
 
+import boto3
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+sts_client = boto3.client('sts')
 
 
 def lambda_handler(event, context):
@@ -40,9 +43,10 @@ def lambda_handler(event, context):
     print('## FINISH                                                                     ##')
     print('################################################################################')
 
+    response = sts_client.get_caller_identity()
     return {
         'statusCode': 200,
-        'body': json.dumps({'message': 'success'})
+        'body': json.dumps(response, default=date_converter, indent=2)
     }
 
 

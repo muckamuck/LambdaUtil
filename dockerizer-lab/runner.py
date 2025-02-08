@@ -2,6 +2,7 @@ import sys
 import json
 import subprocess
 import logging
+import pdb
 
 import boto3
 
@@ -49,6 +50,30 @@ def build_image():
 
     return True
 
+def run_image(creds):
+    try:
+        pdb.set_trace()
+        access_key = creds['AWS_ACCESS_KEY_ID']
+        secret = creds['AWS_SECRET_ACCESS_KEY']
+        token = creds.get('AWS_SESSION_TOKEN')
+        cmd = [
+            'docker',
+            'run',
+            '-d',
+            '--rm',
+            '--name', 'simple-example-invocation',
+            '-p', '9000:8080',
+            '-e', f'AWS_ACCESS_KEY_ID={access_key}',
+            '-e', f'AWS_SECRET_ACCESS_KEY={secret}',
+            # '-e', f'AWS_SESSION_TOKEN={token}',
+            'simple-example-function'
+        ]
+        result = subprocess.run(cmd, text=True)
+        logger.info(result.returncode)
+    except Exception as wtf:
+        logger.critical(f'run_image() problem: {wtf}', exc_info=False)
+        sys.exit(1)
+
 if __name__ == '__main__':
     logging.basicConfig(
         level=logging.INFO,
@@ -60,6 +85,7 @@ if __name__ == '__main__':
     creds = get_creds()
     logger.debug(json.dumps(creds, indent=2))
     build_image()
+    run_image(creds)
 
 '''
 import subprocess
@@ -80,4 +106,4 @@ result = subprocess.run(['echo', '$MY_VAR'],
 
 # Print the result
 print(result.stdout.strip())
-'''
+ '''
