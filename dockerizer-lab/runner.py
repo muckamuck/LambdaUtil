@@ -60,7 +60,6 @@ if __name__ == '__main__':
     creds = get_creds()
     logger.debug(json.dumps(creds, indent=2))
     build_image()
-    run_image(
 
 '''
 import subprocess

@@ -40,7 +40,10 @@ def lambda_handler(event, context):
     print('## FINISH                                                                     ##')
     print('################################################################################')
 
-    return True
+    return {
+        'statusCode': 200,
+        'body': json.dumps({'message': 'success'})
+    }
 
 
 def date_converter(o):
