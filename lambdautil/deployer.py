@@ -465,6 +465,12 @@ class LambdaDeployer:
             stack_parameters.append(wrk)
 
             wrk = {
+                'ParameterKey': 'ephemeralStorage',
+                'ParameterValue': self.config.get('config', {}).get('ephemeral_storage', 512)
+            }
+            stack_parameters.append(wrk)
+
+            wrk = {
                 'ParameterKey': 'timeOut',
                 'ParameterValue': self.config['config']['timeout']
             }
