@@ -466,7 +466,7 @@ class LambdaDeployer:
 
             wrk = {
                 'ParameterKey': 'ephemeralStorage',
-                'ParameterValue': self.config.get('config', {}).get('ephemeral_storage', 512)
+                'ParameterValue': self.config.get('config', {}).get('ephemeral_storage', '512')
             }
             stack_parameters.append(wrk)
 
