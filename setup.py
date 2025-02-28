@@ -3,7 +3,7 @@ import os
 
 
 setup(
-    name='LambdaUtil',
+    name='lambdautil',
     version='0.4.3',
     packages=find_packages(),
     description='Python Lambda Utility',
