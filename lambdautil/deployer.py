@@ -418,7 +418,7 @@ class LambdaDeployer:
             else:
                 wrk = {
                     'ParameterKey': 'runTime',
-                    'ParameterValue': 'python3.10'
+                    'ParameterValue': self.config['config']['runtime']
                 }
                 stack_parameters.append(wrk)
 
@@ -461,6 +461,18 @@ class LambdaDeployer:
             wrk = {
                 'ParameterKey': 'memorySize',
                 'ParameterValue': self.config['config']['memory']
+            }
+            stack_parameters.append(wrk)
+
+            wrk = {
+                'ParameterKey': 'ephemeralStorage',
+                'ParameterValue': self.config.get('config', {}).get('ephemeral_storage', 512)
+            }
+            stack_parameters.append(wrk)
+
+            wrk = {
+                'ParameterKey': 'runTime',
+                'ParameterValue': self.config.get('config', {}).get('runtime', 'python3.12')
             }
             stack_parameters.append(wrk)
 

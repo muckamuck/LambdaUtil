@@ -21,6 +21,12 @@ starter = {
         'timeOut': {
             'Type': 'String'
         },
+        'ephemeralStorage': {
+            'Type': 'Number'
+        },
+        'runTime': {
+            'Type': 'String'
+        },
         'role': {
             'Type': 'String'
         }
@@ -43,6 +49,11 @@ starter = {
                 'Code': {},
                 'Environment': {
                     'Variables': {}
+                },
+                'EphemeralStorage': {
+                    'Size': {
+                        'Ref': 'ephemeralStorage'
+                    }
                 },
                 'FunctionName': {
                     'Ref': 'functionName'
